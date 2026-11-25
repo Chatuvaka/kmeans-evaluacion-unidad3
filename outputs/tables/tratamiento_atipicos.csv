@@ -1,0 +1,4 @@
+variable,Q1,Q3,IQR,cerca_superior_1.5IQR,atipicos_detectados_1.5IQR,cerca_extrema_3IQR,limite_recorte,valores_recortados
+frecuencia_compras,5.75,17.0,11.25,33.875,36,50.75,50.75,0
+gasto_total,2798.605,13042.939999999999,10244.335,28409.442499999997,107,43775.94499999999,58567.06609999998,9
+recencia_dias,18.0,130.0,112.0,298.0,24,466.0,466.0,0

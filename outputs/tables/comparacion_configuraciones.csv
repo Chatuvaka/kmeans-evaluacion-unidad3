@@ -1,0 +1,4 @@
+configuracion,k,escalado,silhouette,davies_bouldin,cluster_mas_chico,cluster_mas_grande,coincidencia_con_A_ARI
+A) K=4 con StandardScaler (modelo final),4,Sí,0.5845394417855935,0.5157648420181837,105,341,1.0
+B) K=3 con StandardScaler,3,Sí,0.5282244010787451,0.6299275608063515,116,572,0.5582323159016781
+C) K=4 sin escalar,4,No,0.3517294187969908,1.0792750366387196,47,510,0.5104322365100695

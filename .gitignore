@@ -1,0 +1,27 @@
+# Entornos virtuales
+venv/
+.venv/
+env/
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.ipynb_checkpoints/
+
+# Streamlit
+.streamlit/secrets.toml
+
+# Editores y sistema operativo
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Archivos temporales
+*.log
+*.tmp
+~$*
+
+# Nota: data/ y outputs/ SÍ se versionan porque son entregables del proyecto.

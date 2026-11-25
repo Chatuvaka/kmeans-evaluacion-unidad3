@@ -1,0 +1,312 @@
+{
+  "proyecto": "Proyecto tercer unidad - Segmentación de clientes con K-Means",
+  "fecha_ejecucion": "2026-11-24 19:42",
+  "dataset_crudo": {
+    "filas": 915,
+    "columnas": 10,
+    "nulos_totales": 97,
+    "duplicados_exactos": 15,
+    "montos_como_texto": 12
+  },
+  "registros_limpios": 900,
+  "variables_cluster": [
+    "frecuencia_compras",
+    "gasto_total",
+    "recencia_dias"
+  ],
+  "k_evaluados": [
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8
+  ],
+  "seleccion_k": {
+    "k_optimo": 4,
+    "k_codo": 4,
+    "k_silhouette": 4,
+    "k_davies_bouldin": 4,
+    "justificacion": "Se selecciona K = 4 como la solución óptima. Aunque K = 2 presenta un coeficiente de silhouette alto (0.581), K = 4 alcanza el máximo global de silhouette (0.585), el menor índice Davies-Bouldin (0.516 frente a 0.560 en K=2) y un índice Calinski-Harabasz sustancialmente superior (2,303 frente a 942 en K=2). Asimismo, la reducción de inercia refleja un codo evidente en K = 4 (53.4% de reducción de K=3 a K=4, cayendo a solo 13.6% de K=4 a K=5). Desde el punto de vista de negocio y de la metodología RFM, K=2 es insuficiente ya que solo divide la base en dos grupos generales (activos vs. inactivos o alto vs. bajo gasto), impidiendo aislar a los clientes VIP ni distinguir clientes ocasionales de clientes en riesgo; K = 4 produce cuatro segmentos claramente diferenciados, interpretables y accionables."
+  },
+  "metricas_modelo_final": {
+    "inercia": 309.99782267842767,
+    "silhouette": 0.5845394417855935,
+    "davies_bouldin": 0.5157648420181837,
+    "calinski_harabasz": 2302.641926511776,
+    "iteraciones": 4
+  },
+  "escalado": [
+    {
+      "variable": "frecuencia_compras",
+      "media_original": 12.4044,
+      "desv_original": 9.0506,
+      "min_original": 1.0,
+      "max_original": 41.0,
+      "media_escalada": 0.0,
+      "desv_escalada": 1.0,
+      "min_escalado": -1.2601,
+      "max_escalado": 3.1595
+    },
+    {
+      "variable": "gasto_total",
+      "media_original": 11467.9971,
+      "desv_original": 13461.1868,
+      "min_original": 204.48,
+      "max_original": 58567.07,
+      "media_escalada": 0.0,
+      "desv_escalada": 1.0,
+      "min_escalado": -0.8367,
+      "max_escalado": 3.4989
+    },
+    {
+      "variable": "recencia_dias",
+      "media_original": 89.1133,
+      "desv_original": 88.4982,
+      "min_original": 1.0,
+      "max_original": 365.0,
+      "media_escalada": 0.0,
+      "desv_escalada": 1.0,
+      "min_escalado": -0.9957,
+      "max_escalado": 3.1174
+    }
+  ],
+  "bitacora_limpieza": [
+    {
+      "paso": "Estandarizar texto",
+      "detalle": "'canal_preferido' unificada a ['App móvil', 'Online', 'Tienda física']",
+      "registros_afectados": 60
+    },
+    {
+      "paso": "Estandarizar texto",
+      "detalle": "'genero' unificada a ['Femenino', 'Masculino']",
+      "registros_afectados": 52
+    },
+    {
+      "paso": "Estandarizar texto",
+      "detalle": "'region' unificada a ['Centro', 'Norte', 'Occidente', 'Sur']",
+      "registros_afectados": 30
+    },
+    {
+      "paso": "Convertir tipo",
+      "detalle": "'gasto_total' de texto ('$12,345.50') a float",
+      "registros_afectados": 12
+    },
+    {
+      "paso": "Eliminar duplicados",
+      "detalle": "filas idénticas eliminadas (se conserva la primera)",
+      "registros_afectados": 15
+    },
+    {
+      "paso": "Eliminar duplicados",
+      "detalle": "id_cliente repetido con datos distintos",
+      "registros_afectados": 0
+    },
+    {
+      "paso": "Valor inválido a nulo",
+      "detalle": "'edad' fuera de rango lógico",
+      "registros_afectados": 7
+    },
+    {
+      "paso": "Valor inválido a nulo",
+      "detalle": "'recencia_dias' fuera de rango lógico",
+      "registros_afectados": 3
+    },
+    {
+      "paso": "Valor inválido a nulo",
+      "detalle": "'frecuencia_compras' fuera de rango lógico",
+      "registros_afectados": 3
+    },
+    {
+      "paso": "Imputar mediana",
+      "detalle": "'edad' = 37.00 (robusta a atípicos)",
+      "registros_afectados": 32
+    },
+    {
+      "paso": "Imputar mediana",
+      "detalle": "'frecuencia_compras' = 9.00 (robusta a atípicos)",
+      "registros_afectados": 3
+    },
+    {
+      "paso": "Imputar mediana",
+      "detalle": "'gasto_total' = 6,794.92 (robusta a atípicos)",
+      "registros_afectados": 18
+    },
+    {
+      "paso": "Imputar mediana",
+      "detalle": "'recencia_dias' = 60.00 (robusta a atípicos)",
+      "registros_afectados": 13
+    },
+    {
+      "paso": "Imputar mediana",
+      "detalle": "'satisfaccion' = 3.00 (robusta a atípicos)",
+      "registros_afectados": 20
+    },
+    {
+      "paso": "Imputar moda",
+      "detalle": "'region' = 'Centro'",
+      "registros_afectados": 8
+    },
+    {
+      "paso": "Imputar moda",
+      "detalle": "'canal_preferido' = 'Tienda física'",
+      "registros_afectados": 15
+    },
+    {
+      "paso": "Recortar atípicos",
+      "detalle": "'frecuencia_compras' limitado a [1.00, 50.75]",
+      "registros_afectados": 0
+    },
+    {
+      "paso": "Recortar atípicos",
+      "detalle": "'gasto_total' limitado a [204.48, 58,567.07]",
+      "registros_afectados": 9
+    },
+    {
+      "paso": "Recortar atípicos",
+      "detalle": "'recencia_dias' limitado a [1.00, 466.00]",
+      "registros_afectados": 0
+    },
+    {
+      "paso": "Variable derivada",
+      "detalle": "ticket_promedio = gasto_total / frecuencia_compras",
+      "registros_afectados": 900
+    }
+  ],
+  "clusters": [
+    {
+      "cluster": 0,
+      "clave": "alto_valor",
+      "nombre": "Clientes VIP de alto valor",
+      "descripcion": "Son los clientes más valiosos: compran con mucha frecuencia, gastan más que nadie y siguen activos. Agrupa 105 clientes (11.7%). En promedio compran 31.6 veces al año, gastan $44,791 MXN anuales (ticket promedio $1,432) y su última compra fue hace 11 días. Canal predominante: App móvil (43%). Satisfacción promedio: 4.34/5.",
+      "clientes": 105,
+      "porcentaje": 11.67,
+      "centroide_original": {
+        "frecuencia_compras": 31.62,
+        "gasto_total": 44790.88,
+        "recencia_dias": 10.95
+      },
+      "centroide_escalado": {
+        "frecuencia_compras": 2.123,
+        "gasto_total": 2.4755,
+        "recencia_dias": -0.8832
+      }
+    },
+    {
+      "cluster": 1,
+      "clave": "regular",
+      "nombre": "Clientes leales regulares",
+      "descripcion": "Compran de forma constante con un gasto intermedio; son la base estable del negocio. Agrupa 248 clientes (27.6%). En promedio compran 17.3 veces al año, gastan $13,139 MXN anuales (ticket promedio $761) y su última compra fue hace 23 días. Canal predominante: Online (40%). Satisfacción promedio: 3.63/5.",
+      "clientes": 248,
+      "porcentaje": 27.56,
+      "centroide_original": {
+        "frecuencia_compras": 17.25,
+        "gasto_total": 13139.39,
+        "recencia_dias": 22.8
+      },
+      "centroide_escalado": {
+        "frecuencia_compras": 0.5358,
+        "gasto_total": 0.1242,
+        "recencia_dias": -0.7493
+      }
+    },
+    {
+      "cluster": 2,
+      "clave": "ocasional",
+      "nombre": "Clientes ocasionales de bajo gasto",
+      "descripcion": "Compran pocas veces y con tickets bajos; son clientes recientes o poco comprometidos con la marca. Agrupa 341 clientes (37.9%). En promedio compran 5.5 veces al año, gastan $2,883 MXN anuales (ticket promedio $517) y su última compra fue hace 73 días. Canal predominante: Tienda física (56%). Satisfacción promedio: 3.11/5.",
+      "clientes": 341,
+      "porcentaje": 37.89,
+      "centroide_original": {
+        "frecuencia_compras": 5.54,
+        "gasto_total": 2882.7,
+        "recencia_dias": 73.3
+      },
+      "centroide_escalado": {
+        "frecuencia_compras": -0.7585,
+        "gasto_total": -0.6378,
+        "recencia_dias": -0.1787
+      }
+    },
+    {
+      "cluster": 3,
+      "clave": "riesgo",
+      "nombre": "Clientes en riesgo de abandono",
+      "descripcion": "Llevan meses sin comprar; si no se reactivan es muy probable que se pierdan. Agrupa 206 clientes (22.9%). En promedio compran 8.1 veces al año, gastan $6,682 MXN anuales (ticket promedio $811) y su última compra fue hace 235 días. Canal predominante: Tienda física (51%). Satisfacción promedio: 2.57/5.",
+      "clientes": 206,
+      "porcentaje": 22.89,
+      "centroide_original": {
+        "frecuencia_compras": 8.14,
+        "gasto_total": 6682.45,
+        "recencia_dias": 234.96
+      },
+      "centroide_escalado": {
+        "frecuencia_compras": -0.4716,
+        "gasto_total": -0.3555,
+        "recencia_dias": 1.648
+      }
+    }
+  ],
+  "comparacion_configuraciones": [
+    {
+      "configuracion": "A) K=4 con StandardScaler (modelo final)",
+      "k": 4,
+      "escalado": "Sí",
+      "silhouette": 0.5845,
+      "davies_bouldin": 0.5158,
+      "cluster_mas_chico": 105,
+      "cluster_mas_grande": 341,
+      "coincidencia_con_A_ARI": 1.0
+    },
+    {
+      "configuracion": "B) K=3 con StandardScaler",
+      "k": 3,
+      "escalado": "Sí",
+      "silhouette": 0.5282,
+      "davies_bouldin": 0.6299,
+      "cluster_mas_chico": 116,
+      "cluster_mas_grande": 572,
+      "coincidencia_con_A_ARI": 0.5582
+    },
+    {
+      "configuracion": "C) K=4 sin escalar",
+      "k": 4,
+      "escalado": "No",
+      "silhouette": 0.3517,
+      "davies_bouldin": 1.0793,
+      "cluster_mas_chico": 47,
+      "cluster_mas_grande": 510,
+      "coincidencia_con_A_ARI": 0.5104
+    }
+  ],
+  "comparacion_texto": [
+    "A vs. B (cambiar K): con K=3 el silhouette pasa de 0.585 a 0.528 (peor). Se fusionan en un mismo grupo: 'Clientes leales regulares' + 'Clientes ocasionales de bajo gasto'. Mezclar perfiles distintos en un solo grupo impide diseñar estrategias específicas, por lo que se conserva el K óptimo.",
+    "A vs. C (escalar o no): sin StandardScaler el gasto (miles de pesos) domina la distancia euclidiana y los grupos se forman casi solo por monto. Se fusionan en un mismo grupo: 'Clientes ocasionales de bajo gasto' + 'Clientes en riesgo de abandono'. Se parten en dos o más grupos: 'Clientes VIP de alto valor'. Al evaluar ambas configuraciones en el espacio estandarizado para una comparación justa, la coincidencia con el modelo final es solo ARI = 0.510 y el silhouette cae a 0.352: la recencia (clave para detectar abandono) y la frecuencia pierden relevancia en la asignación de clústeres."
+  ],
+  "hallazgos": [
+    "Se identificaron 4 segmentos bien diferenciados (K óptimo = 4, silhouette = 0.585); el codo, el silhouette y Davies-Bouldin coinciden en esa elección.",
+    "Concentración del valor: 'Clientes VIP de alto valor' representa solo el 11.7% de los clientes pero aporta el 45.6% del gasto total; cada uno gasta en promedio $44,791 MXN al año.",
+    "Ingreso en riesgo: 'Clientes en riesgo de abandono' agrupa al 22.9% de los clientes, no compra desde hace 235 días en promedio, 21 veces más que los VIP, y su gasto histórico suma $1,376,585 MXN (13.3% del total) que podría perderse.",
+    "Base amplia de bajo valor: 'Clientes ocasionales de bajo gasto' es el 37.9% de los clientes pero solo genera el 9.5% del gasto; su ticket promedio ($517) y frecuencia (5.5 compras/año) son los más bajos, y su canal principal es Tienda física.",
+    "Caracterización con satisfacción (variable descriptiva complementaria): al ser un dataset sintético, la satisfacción no constituye una validación externa independiente, pero sí funciona como una variable descriptiva complementaria muy reveladora: la satisfacción promedio es 4.34/5 en 'Clientes VIP de alto valor' contra solo 2.57/5 en 'Clientes en riesgo de abandono', lo que demuestra consistencia cualitativa entre el abandono en compras y una menor experiencia percibida.",
+    "Canal: el 43% de 'Clientes VIP de alto valor' prefiere App móvil, mientras que en 'Clientes leales regulares' el canal principal es Online.",
+    "Los grupos más parecidos son 'Clientes leales regulares' y 'Clientes ocasionales de bajo gasto' (distancia entre centroides = 1.61 en z-score); los más diferentes son 'Clientes VIP de alto valor' y 'Clientes en riesgo de abandono' (distancia = 4.60)."
+  ],
+  "recomendaciones": [
+    "Retener a 'Clientes VIP de alto valor' con un programa de lealtad premium (acceso anticipado, envío gratis, atención prioritaria y beneficios exclusivos en App móvil). Perder a uno de estos clientes equivale a perder ~$44,791 MXN al año.",
+    "Hacer crecer a 'Clientes leales regulares' con ventas cruzadas, paquetes y metas de puntos para subir su ticket (hoy $761) y convertirlos en VIP.",
+    "Activar a 'Clientes ocasionales de bajo gasto' con cupón de segunda compra, recordatorios personalizados por Tienda física y contenido de bienvenida para aumentar su frecuencia (5.5 compras/año).",
+    "Lanzar una campaña de reactivación (win-back) para 'Clientes en riesgo de abandono': descuento por tiempo limitado, encuesta de satisfacción (su promedio es 2.57/5) y seguimiento a los 60 y 90 días sin compra antes de que el cliente llegue a esta etapa.",
+    "Recalcular la segmentación cada mes y monitorear la migración de clientes entre segmentos como KPI de retención (por ejemplo, % de clientes que pasan de 'regular' a 'en riesgo')."
+  ],
+  "limitaciones": [
+    "El dataset es sintético (generado con semilla fija 42 a partir de distribuciones latentes); los resultados ilustran con fidelidad la metodología de segmentación RFM, pero deben contrastarse con datos reales de transacciones antes de tomar decisiones operativas o comerciales.",
+    "La satisfacción y las variables sociodemográficas se analizan como atributos descriptivos complementarios para perfilar los grupos y no como una validación externa independiente, dado el origen sintético del dataset.",
+    "K-Means asume grupos aproximadamente esféricos y de dispersión similar, es sensible a la escala de las variables y a la presencia de valores atípicos, y requiere definir el número K de antemano.",
+    "El modelo se enfoca estrictamente en las tres variables RFM (recencia, frecuencia y gasto total); no incorpora categorías de producto, margen de rentabilidad, devoluciones ni interacción en canales digitales.",
+    "El coeficiente de silhouette (0.585) constata una separación sólida y compacta de los grupos, pero los clientes situados en las regiones frontera pueden presentar asignaciones con cierto grado de proximidad al clúster vecino.",
+    "Se imputaron 109 celdas nulas mediante mediana (numéricas) y moda (categóricas); si bien preserva el tamaño muestral sin distorsionar tendencias centrales, puede atenuar levemente la varianza natural.",
+    "La segmentación refleja una imagen estática de los últimos 12 meses: los patrones de compra evolucionan con el tiempo y la estacionalidad, por lo que el modelo debe ejecutarse y calibrarse periódicamente."
+  ]
+}

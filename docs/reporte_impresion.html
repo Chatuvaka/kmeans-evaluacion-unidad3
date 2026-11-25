@@ -1,0 +1,910 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Reporte de Evaluación - Tercer Unidad (K-Means)</title>
+    <style>
+        
+@page {
+    size: letter;
+    margin: 18mm 16mm 18mm 16mm;
+    @bottom-right {
+        content: counter(page);
+    }
+}
+
+@page :first {
+    margin: 0;
+    size: letter;
+}
+
+*, *:before, *:after {
+    box-sizing: border-box;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    color: #24292e;
+    line-height: 1.55;
+    font-size: 10.5pt;
+    margin: 0;
+    padding: 0;
+    background-color: #ffffff;
+}
+
+/* Portada de página completa */
+.portada-wrapper {
+    page-break-after: always;
+    break-after: page;
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 0;
+    padding: 0;
+    background: #ffffff;
+}
+
+.portada-wrapper img {
+    max-width: 100%;
+    max-height: 100%;
+    width: auto;
+    height: auto;
+    object-fit: contain;
+}
+
+/* Contenedor del contenido principal */
+.contenido-reporte {
+    padding: 0;
+}
+
+/* Encabezados */
+h1 {
+    font-size: 19pt;
+    font-weight: 700;
+    color: #1a365d;
+    border-bottom: 2.5px solid #2b6cb0;
+    padding-bottom: 6px;
+    margin-top: 24px;
+    margin-bottom: 14px;
+    page-break-before: always;
+    break-before: page;
+}
+
+/* Evitar salto de página en el primer encabezado tras la portada */
+.contenido-reporte > h1:first-of-type {
+    page-break-before: avoid;
+    break-before: avoid;
+    margin-top: 0;
+}
+
+h2 {
+    font-size: 14pt;
+    font-weight: 600;
+    color: #2c5282;
+    margin-top: 20px;
+    margin-bottom: 10px;
+    border-bottom: 1px solid #e2e8f0;
+    padding-bottom: 4px;
+    page-break-after: avoid;
+    break-after: avoid;
+}
+
+h3 {
+    font-size: 12pt;
+    font-weight: 600;
+    color: #2d3748;
+    margin-top: 16px;
+    margin-bottom: 8px;
+    page-break-after: avoid;
+    break-after: avoid;
+}
+
+p {
+    margin-top: 0;
+    margin-bottom: 10px;
+    text-align: justify;
+}
+
+ul, ol {
+    margin-top: 0;
+    margin-bottom: 12px;
+    padding-left: 24px;
+}
+
+li {
+    margin-bottom: 4px;
+}
+
+strong {
+    color: #1a202c;
+    font-weight: 600;
+}
+
+/* Tablas profesionales */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 12px;
+    margin-bottom: 16px;
+    font-size: 9pt;
+    page-break-inside: avoid;
+    break-inside: avoid;
+}
+
+th, td {
+    padding: 7px 10px;
+    border: 1px solid #cbd5e0;
+    text-align: left;
+}
+
+th {
+    background-color: #2b6cb0;
+    color: #ffffff;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+    text-align: center;
+}
+
+tbody tr:nth-child(even) {
+    background-color: #f7fafc;
+}
+
+tbody tr:hover {
+    background-color: #edf2f7;
+}
+
+/* Figuras e imágenes */
+p:has(img), .figura-container {
+    text-align: center;
+    margin-top: 12px;
+    margin-bottom: 14px;
+    page-break-inside: avoid;
+    break-inside: avoid;
+}
+
+img {
+    max-width: 95%;
+    max-height: 460px;
+    width: auto;
+    height: auto;
+    object-fit: contain;
+    display: block;
+    margin: 8px auto;
+    border-radius: 4px;
+    border: 1px solid #cbd5e0;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+
+/* Cajas de notas y códigos */
+blockquote {
+    border-left: 4px solid #3182ce;
+    background-color: #ebf8ff;
+    color: #2b6cb0;
+    padding: 10px 14px;
+    margin: 12px 0;
+    border-radius: 0 4px 4px 0;
+}
+
+code {
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, Courier, monospace;
+    font-size: 9pt;
+    background-color: #edf2f7;
+    color: #c53030;
+    padding: 2px 5px;
+    border-radius: 3px;
+}
+
+pre {
+    background-color: #2d3748;
+    color: #f7fafc;
+    padding: 12px;
+    border-radius: 5px;
+    overflow-x: auto;
+    font-size: 8.5pt;
+    page-break-inside: avoid;
+    break-inside: avoid;
+}
+
+pre code {
+    background-color: transparent;
+    color: inherit;
+    padding: 0;
+}
+
+hr {
+    border: none;
+    border-top: 1px solid #e2e8f0;
+    margin: 22px 0;
+}
+
+    </style>
+</head>
+<body>
+    <div class="portada-wrapper">
+        <img src="file:///C:/Users/chatu/OneDrive/Desktop/proyecto_tercer_unidad_kmeans/docs/portada.png" alt="Portada Oficial UTSLRC IDGS">
+    </div>
+    <div class="contenido-reporte">
+        <h1>2. Introducción y planteamiento del problema</h1>
+<h2>Introducción</h2>
+<p>Las empresas de venta al menudeo acumulan información de miles de clientes, pero suelen tratarlos a todos por igual: la misma promoción, el mismo mensaje y el mismo canal. Esto desperdicia presupuesto de marketing en clientes que no responden y descuida a quienes generan la mayor parte del ingreso.</p>
+<p>La <strong>segmentación de clientes</strong> agrupa a personas con un comportamiento de compra parecido para atender a cada grupo con una estrategia distinta. En este proyecto se aplica el algoritmo de aprendizaje no supervisado <strong>K-Means</strong> sobre tres variables del modelo <strong>RFM</strong>:</p>
+<ul>
+<li><strong>Recencia (R):</strong> días desde la última compra.</li>
+<li><strong>Frecuencia (F):</strong> número de compras en los últimos 12 meses.</li>
+<li><strong>Monto (M):</strong> gasto total en los últimos 12 meses.</li>
+</ul>
+<p>Los resultados se presentan en un <strong>dashboard interactivo desarrollado con Streamlit</strong>.</p>
+<h2>Planteamiento del problema</h2>
+<p>La empresa no sabe:</p>
+<ol>
+<li>Qué clientes generan la mayor parte del ingreso y deben protegerse.</li>
+<li>Qué clientes dejaron de comprar y están en riesgo de abandono.</li>
+<li>Qué clientes compran poco y podrían crecer con la promoción adecuada.</li>
+</ol>
+<p>Sin esa información, las campañas de retención y promoción se diseñan &quot;a ciegas&quot;. <strong>Pregunta guía:</strong> <em>¿Qué grupos de comportamiento de compra existen entre los clientes según su recencia, frecuencia y gasto, y qué estrategia conviene aplicar a cada uno?</em></p>
+<hr />
+<h1>3. Objetivos</h1>
+<h2>Objetivo general</h2>
+<p>Segmentar a los clientes con el algoritmo K-Means usando sus variables de recencia, frecuencia y gasto, para identificar grupos de comportamiento de compra y proponer estrategias de retención y promoción basadas en datos, presentadas en un dashboard interactivo.</p>
+<h2>Objetivos específicos</h2>
+<ol>
+<li>Explorar el dataset para identificar su estructura, tipos de datos, valores nulos, duplicados y atípicos.</li>
+<li>Limpiar y preprocesar los datos (inconsistencias, nulos, duplicados, tipos, atípicos y codificación) y escalar las variables con <code>StandardScaler</code>.</li>
+<li>Determinar el número óptimo de clústeres evaluando al menos 5 valores de K con el método del codo y el coeficiente de silhouette.</li>
+<li>Entrenar el modelo final, interpretar sus centroides y asignar un nombre descriptivo a cada clúster.</li>
+<li>Comparar dos configuraciones del modelo y explicar sus diferencias.</li>
+<li>Desarrollar un dashboard en Streamlit con indicadores, filtros y visualizaciones de los resultados.</li>
+<li>Redactar hallazgos, recomendaciones y limitaciones del modelo.</li>
+</ol>
+<hr />
+<h1>4. Descripción del dataset</h1>
+<table>
+<thead>
+<tr>
+<th>Característica</th>
+<th>Valor</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Archivo crudo</td>
+<td><code>data/raw/clientes_segmentacion.csv</code></td>
+</tr>
+<tr>
+<td>Origen</td>
+<td>Dataset sintético generado con <code>src/generar_dataset.py</code> (semilla fija <code>np.random.seed(42)</code>)</td>
+</tr>
+<tr>
+<td>Registros crudos</td>
+<td><strong>915</strong> (900 clientes + 15 filas duplicadas)</td>
+</tr>
+<tr>
+<td>Variables</td>
+<td><strong>10</strong></td>
+</tr>
+<tr>
+<td>Registros después de la limpieza</td>
+<td><strong>900</strong></td>
+</tr>
+<tr>
+<td>Archivo final</td>
+<td><code>data/processed/clientes_segmentados.csv</code> (incluye <code>cluster</code> y <code>cluster_nombre</code>)</td>
+</tr>
+</tbody>
+</table>
+<h2>Diccionario de variables</h2>
+<table>
+<thead>
+<tr>
+<th>Variable</th>
+<th>Tipo</th>
+<th>Descripción</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>id_cliente</code></td>
+<td>Texto</td>
+<td>Identificador único del cliente (CLI-0001…)</td>
+</tr>
+<tr>
+<td><code>edad</code></td>
+<td>Numérica</td>
+<td>Edad del cliente en años</td>
+</tr>
+<tr>
+<td><code>genero</code></td>
+<td>Categórica</td>
+<td>Masculino / Femenino</td>
+</tr>
+<tr>
+<td><code>region</code></td>
+<td>Categórica</td>
+<td>Norte, Centro, Sur, Occidente</td>
+</tr>
+<tr>
+<td><code>canal_preferido</code></td>
+<td>Categórica</td>
+<td>Online, App móvil, Tienda física</td>
+</tr>
+<tr>
+<td><code>antiguedad_meses</code></td>
+<td>Numérica</td>
+<td>Meses desde su registro como cliente</td>
+</tr>
+<tr>
+<td><code>frecuencia_compras</code></td>
+<td>Numérica</td>
+<td>Compras en los últimos 12 meses <strong>(F)</strong></td>
+</tr>
+<tr>
+<td><code>gasto_total</code></td>
+<td>Numérica</td>
+<td>Gasto en MXN en los últimos 12 meses <strong>(M)</strong></td>
+</tr>
+<tr>
+<td><code>recencia_dias</code></td>
+<td>Numérica</td>
+<td>Días desde la última compra <strong>(R)</strong></td>
+</tr>
+<tr>
+<td><code>satisfaccion</code></td>
+<td>Numérica ordinal</td>
+<td>Calificación de 1 a 5 de la última encuesta</td>
+</tr>
+<tr>
+<td><code>ticket_promedio</code></td>
+<td>Numérica (derivada)</td>
+<td><code>gasto_total / frecuencia_compras</code> (se crea en la limpieza)</td>
+</tr>
+</tbody>
+</table>
+<h2>Problemas de calidad detectados en el dataset crudo</h2>
+<table>
+<thead>
+<tr>
+<th>Problema</th>
+<th>Cantidad</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Celdas nulas (edad, gasto, recencia, canal, satisfacción, región)</td>
+<td>97</td>
+</tr>
+<tr>
+<td>Filas duplicadas exactas</td>
+<td>15</td>
+</tr>
+<tr>
+<td>Montos de gasto guardados como texto (<code>&quot;$12,345.50&quot;</code>)</td>
+<td>12</td>
+</tr>
+<tr>
+<td>Categorías inconsistentes (<code>online</code>, <code>ONLINE</code>, <code>App movil</code>, <code>M</code>, <code>FEMENINO</code>…)</td>
+<td>142 valores</td>
+</tr>
+<tr>
+<td>Edades imposibles (150 años o 2 años)</td>
+<td>7</td>
+</tr>
+<tr>
+<td>Recencias negativas / frecuencia igual a 0</td>
+<td>3 / 3</td>
+</tr>
+<tr>
+<td>Gastos extremos por error de captura</td>
+<td>6 inyectados (9 recortados por la regla)</td>
+</tr>
+</tbody>
+</table>
+<p><img src="file:///C:/Users/chatu/OneDrive/Desktop/proyecto_tercer_unidad_kmeans/outputs/figures/captura_01_consola_exploracion.png" alt="Captura 1: Exploración del dataset crudo en consola" /></p>
+<hr />
+<h1>5. Desarrollo del proyecto</h1>
+<h2>5.1 Herramientas</h2>
+<p>Python 3.12, Pandas, NumPy, Scikit-learn, Matplotlib, Seaborn, Plotly y Streamlit. El proyecto se organizó en scripts modulares:</p>
+<table>
+<thead>
+<tr>
+<th>Script</th>
+<th>Función</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>src/generar_dataset.py</code></td>
+<td>Genera el dataset crudo con errores intencionales</td>
+</tr>
+<tr>
+<td><code>src/analisis_kmeans.py</code></td>
+<td>Exploración, limpieza, escalado, selección de K, modelo y comparación</td>
+</tr>
+<tr>
+<td><code>src/interpretacion.py</code></td>
+<td>Nombres de clústeres, estadísticas, hallazgos y recomendaciones</td>
+</tr>
+<tr>
+<td><code>src/main.py</code></td>
+<td>Ejecuta todo el pipeline y guarda resultados</td>
+</tr>
+<tr>
+<td><code>app.py</code></td>
+<td>Dashboard interactivo de Streamlit</td>
+</tr>
+</tbody>
+</table>
+<h2>5.2 Exploración de datos</h2>
+<p>Se cargó el CSV con <code>pd.read_csv()</code> y se revisaron los primeros 10 registros, dimensiones, columnas, tipos de datos, estadísticas descriptivas, nulos y duplicados. Se detectó que <code>gasto_total</code> se leía como texto por los montos con <code>$</code>, y que las categorías tenían múltiples escrituras para un mismo valor.</p>
+<p><img src="file:///C:/Users/chatu/OneDrive/Desktop/proyecto_tercer_unidad_kmeans/outputs/figures/01_distribucion_variables.png" alt="Distribución de variables" /></p>
+<p><img src="file:///C:/Users/chatu/OneDrive/Desktop/proyecto_tercer_unidad_kmeans/outputs/figures/02_boxplots_atipicos.png" alt="Boxplots de atípicos" /></p>
+<p><img src="file:///C:/Users/chatu/OneDrive/Desktop/proyecto_tercer_unidad_kmeans/outputs/figures/03_categorias_inconsistentes.png" alt="Categorías inconsistentes" /></p>
+<p><img src="file:///C:/Users/chatu/OneDrive/Desktop/proyecto_tercer_unidad_kmeans/outputs/figures/04_matriz_correlacion.png" alt="Matriz de correlación" /></p>
+<p><strong>Variables seleccionadas para agrupar y justificación:</strong></p>
+<ul>
+<li><strong><code>recencia_dias</code> (R):</strong> mide qué tan activo está el cliente; es el mejor indicador temprano de abandono.</li>
+<li><strong><code>frecuencia_compras</code> (F):</strong> mide el hábito y la lealtad.</li>
+<li><strong><code>gasto_total</code> (M):</strong> mide el valor económico del cliente.</li>
+</ul>
+<p>Las tres responden directamente a la problemática, son numéricas continuas (adecuadas para la distancia euclidiana de K-Means) y no son redundantes. <code>ticket_promedio</code> se descartó por ser una combinación de gasto y frecuencia; edad, satisfacción y las variables categóricas se reservaron para describir y validar los clústeres.</p>
+<h2>5.3 Limpieza y preprocesamiento</h2>
+<table>
+<thead>
+<tr>
+<th>Paso</th>
+<th>Acción</th>
+<th>Registros afectados</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Inconsistencias</td>
+<td>Unificar <code>canal_preferido</code>, <code>genero</code> y <code>region</code> (espacios, mayúsculas, acentos, abreviaturas)</td>
+<td>60 + 52 + 30</td>
+</tr>
+<tr>
+<td>Tipos de datos</td>
+<td>Convertir <code>gasto_total</code> de texto a número</td>
+<td>12</td>
+</tr>
+<tr>
+<td>Duplicados</td>
+<td>Eliminar filas idénticas</td>
+<td>15</td>
+</tr>
+<tr>
+<td>Valores inválidos</td>
+<td>Edad fuera de 18–90, recencia negativa y frecuencia 0 se marcan como nulos</td>
+<td>7 + 3 + 3</td>
+</tr>
+<tr>
+<td>Nulos numéricos</td>
+<td>Imputación con la <strong>mediana</strong> (robusta a atípicos)</td>
+<td>86</td>
+</tr>
+<tr>
+<td>Nulos categóricos</td>
+<td>Imputación con la <strong>moda</strong></td>
+<td>23</td>
+</tr>
+<tr>
+<td>Atípicos</td>
+<td>Detección con IQR (1.5×) y recorte (<em>capping</em>) solo de los valores que superan la cerca extrema 3×IQR <strong>y</strong> el percentil 99</td>
+<td>9 (gasto)</td>
+</tr>
+<tr>
+<td>Variable derivada</td>
+<td><code>ticket_promedio = gasto_total / frecuencia_compras</code></td>
+<td>900</td>
+</tr>
+<tr>
+<td>Codificación</td>
+<td>One-Hot Encoding de <code>genero</code>, <code>region</code>, <code>canal_preferido</code> → <code>data/processed/clientes_limpios_codificados.csv</code></td>
+<td>9 columnas nuevas</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Criterio para atípicos:</strong> la regla clásica de Tukey (1.5×IQR) marcó 107 gastos como atípicos, pero la mayoría son clientes de alto valor legítimos. Eliminarlos borraría justamente al segmento más importante, por lo que solo se recortaron los 9 valores extremos que correspondían a errores de captura y no se eliminó ningún cliente.</p>
+<p><strong>Codificación:</strong> las variables categóricas codificadas no entran a K-Means porque mezclar columnas 0/1 con variables continuas distorsiona la distancia euclidiana; se usan para describir el perfil de cada clúster.</p>
+<p><img src="file:///C:/Users/chatu/OneDrive/Desktop/proyecto_tercer_unidad_kmeans/outputs/figures/06_boxplots_despues_limpieza.png" alt="Boxplots después de la limpieza" /></p>
+<h3>Escalado con StandardScaler</h3>
+<table>
+<thead>
+<tr>
+<th>Variable</th>
+<th>Media original</th>
+<th>Desv. original</th>
+<th>Media escalada</th>
+<th>Desv. escalada</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>frecuencia_compras</td>
+<td>12.40</td>
+<td>9.05</td>
+<td>0.00</td>
+<td>1.00</td>
+</tr>
+<tr>
+<td>gasto_total</td>
+<td>11,468.00</td>
+<td>13,461.19</td>
+<td>0.00</td>
+<td>1.00</td>
+</tr>
+<tr>
+<td>recencia_dias</td>
+<td>89.11</td>
+<td>88.50</td>
+<td>0.00</td>
+<td>1.00</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Explicación:</strong> antes de escalar, la desviación estándar del gasto era unas <strong>1,487 veces</strong> la de la frecuencia; como K-Means se basa en distancias, el gasto habría dominado por completo el agrupamiento. <code>StandardScaler</code> aplica <code>z = (x − media) / desviación</code>, dejando las tres variables con media 0 y desviación 1, de modo que pesan lo mismo.</p>
+<p><img src="file:///C:/Users/chatu/OneDrive/Desktop/proyecto_tercer_unidad_kmeans/outputs/figures/07_escalado_antes_despues.png" alt="Escalado antes y después" /></p>
+<h2>5.4 Implementación de K-Means</h2>
+<p>Se evaluaron <strong>7 valores de K (2 a 8)</strong> con <code>KMeans(n_init=10, random_state=42)</code>:</p>
+<table>
+<thead>
+<tr>
+<th>K</th>
+<th>Inercia</th>
+<th>Silhouette</th>
+<th>Davies-Bouldin</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>2</td>
+<td>1,318.04</td>
+<td>0.581</td>
+<td>0.560</td>
+</tr>
+<tr>
+<td>3</td>
+<td>665.75</td>
+<td>0.528</td>
+<td>0.630</td>
+</tr>
+<tr>
+<td><strong>4</strong></td>
+<td><strong>310.00</strong></td>
+<td><strong>0.585</strong></td>
+<td><strong>0.516</strong></td>
+</tr>
+<tr>
+<td>5</td>
+<td>267.77</td>
+<td>0.529</td>
+<td>0.733</td>
+</tr>
+<tr>
+<td>6</td>
+<td>228.18</td>
+<td>0.501</td>
+<td>0.815</td>
+</tr>
+<tr>
+<td>7</td>
+<td>192.61</td>
+<td>0.437</td>
+<td>0.898</td>
+</tr>
+<tr>
+<td>8</td>
+<td>174.31</td>
+<td>0.344</td>
+<td>1.011</td>
+</tr>
+</tbody>
+</table>
+<p><img src="file:///C:/Users/chatu/OneDrive/Desktop/proyecto_tercer_unidad_kmeans/outputs/figures/08_codo_silhouette.png" alt="Codo y silhouette" /></p>
+<p><strong>Justificación del K óptimo = 4:</strong></p>
+<p>Se compararon minuciosamente los resultados entre las diferentes opciones de K:</p>
+<ul>
+<li>Aunque <strong>K = 2</strong> presenta un coeficiente de silhouette alto (0.581), <strong>K = 4</strong> alcanza el máximo global de silhouette (<strong>0.585</strong>), el menor índice Davies-Bouldin (<strong>0.516</strong> frente a 0.560 en K=2) y un índice Calinski-Harabasz de <strong>2,302.6</strong> (frente a 941.5 en K=2, más del doble).</li>
+<li>En cuanto a la inercia (WCSS), de K=3 a K=4 se reduce un <strong>53.4 %</strong>, marcando el &quot;codo&quot; de la curva; a partir de K=4, aumentar a K=5 apenas reduce la inercia en un <strong>13.6 %</strong>, lo que indica rendimientos decrecientes.</li>
+<li>Desde la perspectiva de negocio y la metodología RFM, K=2 es metodológicamente insuficiente, pues divide los datos en dos mitades genéricas (activos vs. inactivos o alto vs. bajo gasto) sin poder distinguir a los clientes VIP de los regulares ni a los clientes en riesgo de los ocasionales. <strong>K = 4</strong> proporciona cuatro segmentos nítidamente diferenciados, interpretables y con estrategias de retención y crecimiento bien definidas.</li>
+</ul>
+<p>El modelo final se entrenó con <code>fit_predict()</code> y K=4 (convergió en 4 iteraciones).</p>
+<p><img src="file:///C:/Users/chatu/OneDrive/Desktop/proyecto_tercer_unidad_kmeans/outputs/figures/captura_02_consola_centroides.png" alt="Captura 2: Modelo final K-Means y centroides en consola" /></p>
+<hr />
+<h1>6. Resultados y análisis</h1>
+<h2>6.1 Centroides e interpretación</h2>
+<table>
+<thead>
+<tr>
+<th>Clúster</th>
+<th>Frecuencia (compras/año)</th>
+<th>Gasto anual (MXN)</th>
+<th>Recencia (días)</th>
+<th>z-score F / M / R</th>
+<th>Lectura</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>C0</td>
+<td>31.6</td>
+<td>44,791</td>
+<td>11</td>
+<td>+2.12 / +2.48 / −0.88</td>
+<td>Compra mucho, gasta mucho y está activo</td>
+</tr>
+<tr>
+<td>C1</td>
+<td>17.3</td>
+<td>13,139</td>
+<td>23</td>
+<td>+0.54 / +0.12 / −0.75</td>
+<td>Compra seguido con gasto intermedio</td>
+</tr>
+<tr>
+<td>C2</td>
+<td>5.5</td>
+<td>2,883</td>
+<td>73</td>
+<td>−0.76 / −0.64 / −0.18</td>
+<td>Compra poco y gasta poco</td>
+</tr>
+<tr>
+<td>C3</td>
+<td>8.1</td>
+<td>6,682</td>
+<td>235</td>
+<td>−0.47 / −0.36 / +1.65</td>
+<td>Lleva casi 8 meses sin comprar</td>
+</tr>
+</tbody>
+</table>
+<p><img src="file:///C:/Users/chatu/OneDrive/Desktop/proyecto_tercer_unidad_kmeans/outputs/figures/12_perfil_centroides.png" alt="Perfil de centroides" /></p>
+<h2>6.2 Registros por clúster y nombres descriptivos</h2>
+<table>
+<thead>
+<tr>
+<th>Clúster</th>
+<th>Nombre descriptivo</th>
+<th>Clientes</th>
+<th>% clientes</th>
+<th>% del gasto total</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>C0</td>
+<td><strong>Clientes VIP de alto valor</strong></td>
+<td>105</td>
+<td>11.7 %</td>
+<td>45.6 %</td>
+</tr>
+<tr>
+<td>C1</td>
+<td><strong>Clientes leales regulares</strong></td>
+<td>248</td>
+<td>27.6 %</td>
+<td>31.6 %</td>
+</tr>
+<tr>
+<td>C2</td>
+<td><strong>Clientes ocasionales de bajo gasto</strong></td>
+<td>341</td>
+<td>37.9 %</td>
+<td>9.5 %</td>
+</tr>
+<tr>
+<td>C3</td>
+<td><strong>Clientes en riesgo de abandono</strong></td>
+<td>206</td>
+<td>22.9 %</td>
+<td>13.3 %</td>
+</tr>
+</tbody>
+</table>
+<p><img src="file:///C:/Users/chatu/OneDrive/Desktop/proyecto_tercer_unidad_kmeans/outputs/figures/11_distribucion_clusters.png" alt="Distribución por clúster" /></p>
+<p><img src="file:///C:/Users/chatu/OneDrive/Desktop/proyecto_tercer_unidad_kmeans/outputs/figures/09_clusters_dispersion_centroides.png" alt="Dispersión con centroides" /></p>
+<p><img src="file:///C:/Users/chatu/OneDrive/Desktop/proyecto_tercer_unidad_kmeans/outputs/figures/10_clusters_pca.png" alt="Proyección PCA" /></p>
+<h2>6.3 Tabla comparativa (estadísticas descriptivas por clúster)</h2>
+<table>
+<thead>
+<tr>
+<th>Indicador</th>
+<th>VIP</th>
+<th>Leales regulares</th>
+<th>Ocasionales</th>
+<th>En riesgo</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Frecuencia media</td>
+<td>31.6</td>
+<td>17.3</td>
+<td>5.5</td>
+<td>8.1</td>
+</tr>
+<tr>
+<td>Gasto medio (MXN)</td>
+<td>44,791</td>
+<td>13,139</td>
+<td>2,883</td>
+<td>6,682</td>
+</tr>
+<tr>
+<td>Gasto mediano (MXN)</td>
+<td>45,956</td>
+<td>12,455</td>
+<td>2,439</td>
+<td>6,234</td>
+</tr>
+<tr>
+<td>Recencia media (días)</td>
+<td>11</td>
+<td>23</td>
+<td>73</td>
+<td>235</td>
+</tr>
+<tr>
+<td>Ticket promedio (MXN)</td>
+<td>1,432</td>
+<td>761</td>
+<td>517</td>
+<td>811</td>
+</tr>
+<tr>
+<td>Edad media</td>
+<td>41.9</td>
+<td>38.1</td>
+<td>32.3</td>
+<td>44.9</td>
+</tr>
+<tr>
+<td>Antigüedad media (meses)</td>
+<td>58.0</td>
+<td>36.0</td>
+<td>17.1</td>
+<td>40.5</td>
+</tr>
+<tr>
+<td>Satisfacción media (1-5)</td>
+<td>4.34</td>
+<td>3.63</td>
+<td>3.11</td>
+<td>2.57</td>
+</tr>
+<tr>
+<td>Canal principal</td>
+<td>App móvil (43 %)</td>
+<td>Online (40 %)</td>
+<td>Tienda física (56 %)</td>
+<td>Tienda física (51 %)</td>
+</tr>
+</tbody>
+</table>
+<p>La tabla completa con <code>describe()</code> por clúster está en <code>outputs/tables/estadisticas_por_cluster.csv</code>.</p>
+<p><img src="file:///C:/Users/chatu/OneDrive/Desktop/proyecto_tercer_unidad_kmeans/outputs/figures/13_boxplots_por_cluster.png" alt="Boxplots por clúster" /></p>
+<p><img src="file:///C:/Users/chatu/OneDrive/Desktop/proyecto_tercer_unidad_kmeans/outputs/figures/14_canal_por_cluster.png" alt="Canal por clúster" /></p>
+<h2>6.4 Similitudes y diferencias</h2>
+<ul>
+<li>Los grupos <strong>más parecidos</strong> son <em>Leales regulares</em> y <em>Ocasionales</em> (distancia entre centroides = 1.61 en z-score): ambos están activos y se diferencian sobre todo en cuánto compran.</li>
+<li>Los <strong>más diferentes</strong> son <em>VIP</em> y <em>En riesgo</em> (distancia = 4.60): opuestos en las tres variables.</li>
+<li><em>En riesgo</em> y <em>Ocasionales</em> tienen gasto y frecuencia bajos, pero los separa la recencia (235 vs. 73 días).</li>
+<li><em>En riesgo</em> tiene un ticket promedio (811 MXN) similar al de <em>Leales</em> (761 MXN): fueron buenos clientes que dejaron de comprar.</li>
+</ul>
+<h2>6.5 Comparación de dos configuraciones del modelo</h2>
+<table>
+<thead>
+<tr>
+<th>Configuración</th>
+<th>K</th>
+<th>Escalado</th>
+<th>Silhouette</th>
+<th>Davies-Bouldin</th>
+<th>Clúster más chico</th>
+<th>Clúster más grande</th>
+<th>Coincidencia con A (ARI)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>A) Modelo final</strong></td>
+<td>4</td>
+<td>Sí</td>
+<td><strong>0.585</strong></td>
+<td><strong>0.516</strong></td>
+<td>105</td>
+<td>341</td>
+<td>1.000</td>
+</tr>
+<tr>
+<td>B) Un clúster menos</td>
+<td>3</td>
+<td>Sí</td>
+<td>0.528</td>
+<td>0.630</td>
+<td>116</td>
+<td>572</td>
+<td>0.56</td>
+</tr>
+<tr>
+<td>C) Sin escalar</td>
+<td>4</td>
+<td>No</td>
+<td>0.352</td>
+<td>1.08</td>
+<td>47</td>
+<td>510</td>
+<td>0.51</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Nota metodológica sobre el espacio de cálculo:</strong>
+Las métricas de Silhouette y Davies-Bouldin de todas las configuraciones (incluyendo la opción sin escalar C) se calcularon rigurosamente en el <strong>espacio estandarizado (z-score)</strong> de las variables RFM. Esto garantiza una comparación matemática justa bajo una misma métrica geométrica. Si la configuración C se evaluara en su espacio original sin normalizar, las distancias euclidianas reflejarían casi en un 100 % las diferencias en pesos del gasto total (desviación estándar de 13,461 MXN frente a 9.05 en frecuencia y 88.5 días en recencia), distorsionando el análisis y ocultando que el algoritmo ignoró la recencia y la frecuencia en la delimitación de los clústeres.</p>
+<ul>
+<li><strong>A vs. B (cambiar K):</strong> con K=3 el silhouette baja de 0.585 a 0.528 y se <strong>fusionan</strong> <em>Leales regulares</em> con <em>Ocasionales</em> en un grupo masivo de 572 clientes. Mezclar clientes que compran 17 veces al año con otros que compran 5 impide diseñar estrategias comerciales específicas.</li>
+<li><strong>A vs. C (con/sin tratamiento de escala):</strong> sin <code>StandardScaler</code> el gasto domina la distancia: el segmento VIP <strong>se parte en dos</strong> solo por monto y los clientes <em>En riesgo</em> <strong>se mezclan</strong> con los <em>Ocasionales</em>, porque la recencia deja de influir. Al evaluar en el espacio estandarizado común, la coincidencia cae a ARI = 0.51 y el silhouette baja a 0.352. Esto demuestra que el escalado es indispensable para la segmentación RFM.</li>
+</ul>
+<p><img src="file:///C:/Users/chatu/OneDrive/Desktop/proyecto_tercer_unidad_kmeans/outputs/figures/15_comparacion_configuraciones.png" alt="Comparación de configuraciones" /></p>
+<hr />
+<h1>7. Dashboard</h1>
+<p>El dashboard se ejecuta con <code>streamlit run app.py</code> y tiene <strong>dos páginas</strong> seleccionables desde la barra lateral. Los filtros aplican a ambas páginas.</p>
+<p><strong>Filtros interactivos (4):</strong> clúster, canal preferido, rango de gasto anual y rango de frecuencia de compra.</p>
+<h2>Página 1: Análisis general</h2>
+<ul>
+<li><strong>4 KPI:</strong> clientes analizados, gasto total acumulado, frecuencia promedio y recencia promedio (con comparación contra el total).</li>
+<li>Histograma con boxplot de la variable seleccionada, gráfica de dona por canal, barras por región y canal, mapa de correlación y dispersión frecuencia-gasto.</li>
+<li>Tabla de estadísticas descriptivas, vista de registros con descarga en CSV y resumen de la limpieza.</li>
+</ul>
+<p><img src="file:///C:/Users/chatu/OneDrive/Desktop/proyecto_tercer_unidad_kmeans/outputs/figures/captura_03_pagina1_kpi.png" alt="Captura 3: Página 1 del Dashboard – encabezado, filtros en barra lateral y 4 KPI" /></p>
+<p><img src="file:///C:/Users/chatu/OneDrive/Desktop/proyecto_tercer_unidad_kmeans/outputs/figures/captura_04_pagina1_graficas.png" alt="Captura 4: Página 1 del Dashboard – gráficas de distribución, canales y correlación" /></p>
+<h2>Página 2: Segmentación mediante K-Means</h2>
+<ul>
+<li><strong>4 KPI:</strong> K óptimo con silhouette, segmento más numeroso, % del gasto generado por VIP y clientes en riesgo.</li>
+<li><strong>Distribución de registros por clúster</strong> (barras).</li>
+<li><strong>Dispersión</strong> 2D con centroides claramente identificados del modelo completo (ejes seleccionables) y vista 3D RFM.</li>
+<li><strong>Gráficas comparativas:</strong> boxplot por clúster de la variable elegida, perfil promedio por clúster (índice 100 = promedio) y canal preferido por clúster.</li>
+<li><strong>Tabla de estadísticas descriptivas</strong> de los clústeres.</li>
+<li>Resultados del modelo: codo, silhouette, métricas, centroides y comparación de configuraciones.</li>
+<li><strong>Descripción de los grupos</strong> con su nombre descriptivo.</li>
+<li><strong>Hallazgos, recomendaciones</strong> y limitaciones.</li>
+</ul>
+<p><img src="file:///C:/Users/chatu/OneDrive/Desktop/proyecto_tercer_unidad_kmeans/outputs/figures/captura_05_pagina2_kpi_dispersion.png" alt="Captura 5: Página 2 del Dashboard – KPI, distribución por clúster y dispersión 2D con centroides" /></p>
+<p><img src="file:///C:/Users/chatu/OneDrive/Desktop/proyecto_tercer_unidad_kmeans/outputs/figures/captura_06_pagina2_comparativas.png" alt="Captura 6: Página 2 del Dashboard – gráficas comparativas entre clústeres y tabla de estadísticas" /></p>
+<p><img src="file:///C:/Users/chatu/OneDrive/Desktop/proyecto_tercer_unidad_kmeans/outputs/figures/captura_07_pagina2_descripcion_hallazgos.png" alt="Captura 7: Página 2 del Dashboard – descripción detallada de segmentos, hallazgos y recomendaciones" /></p>
+<p><img src="file:///C:/Users/chatu/OneDrive/Desktop/proyecto_tercer_unidad_kmeans/outputs/figures/captura_08_dashboard_filtros_aplicados.png" alt="Captura 8: Dashboard con filtros interactivos aplicados" /></p>
+<hr />
+<h1>8. Conclusiones y recomendaciones</h1>
+<h2>Hallazgos principales</h2>
+<ol>
+<li><strong>Se identificaron 4 segmentos bien diferenciados</strong> (silhouette = 0.585); el codo, el silhouette y Davies-Bouldin coinciden en K = 4.</li>
+<li><strong>El valor está muy concentrado:</strong> los <em>Clientes VIP</em> son solo el 11.7 % de la base, pero aportan el <strong>45.6 % del gasto total</strong> (44,791 MXN anuales por cliente en promedio).</li>
+<li><strong>Hay ingreso en riesgo:</strong> el 22.9 % de los clientes no compra desde hace 235 días en promedio (21 veces más que los VIP) y su gasto suma <strong>1,376,585 MXN</strong> (13.3 % del total).</li>
+<li><strong>La base más grande es la de menor valor:</strong> los <em>Ocasionales</em> son el 37.9 % de los clientes pero solo generan el 9.5 % del gasto; prefieren la tienda física.</li>
+<li><strong>Caracterización complementaria mediante satisfacción:</strong> al tratarse de un dataset sintético con perfiles latentes, la satisfacción no constituye una validación externa independiente, sino una variable descriptiva complementaria muy valiosa: la satisfacción promedio es <strong>4.34/5</strong> en clientes VIP frente a solo <strong>2.57/5</strong> en clientes <em>En riesgo</em>, reforzando cualitativamente que el abandono en compras se asocia a una menor experiencia percibida.</li>
+</ol>
+<h2>Recomendaciones</h2>
+<ol>
+<li><strong>VIP – Retener:</strong> programa de lealtad premium (acceso anticipado, envío gratis, atención prioritaria y beneficios exclusivos en la App móvil, su canal preferido). Perder a un cliente de este segmento representa perder ~$44,791 MXN al año.</li>
+<li><strong>Leales regulares – Hacer crecer:</strong> ventas cruzadas, paquetes y metas de puntos para subir su ticket (hoy $761 MXN) y convertirlos en VIP.</li>
+<li><strong>Ocasionales – Activar:</strong> cupón de segunda compra, recordatorios personalizados en tienda física y contenido de bienvenida para aumentar su frecuencia (5.5 compras/año).</li>
+<li><strong>En riesgo – Reactivar:</strong> campaña <em>win-back</em> con descuento por tiempo limitado, encuesta de satisfacción (promedio 2.57/5) y alertas automáticas a los 60 y 90 días sin compra.</li>
+<li><strong>General:</strong> recalcular la segmentación cada mes y medir la migración de clientes entre segmentos como KPI clave de retención.</li>
+</ol>
+<h2>Limitaciones del modelo</h2>
+<ul>
+<li><strong>Dataset sintético:</strong> el dataset fue generado con distribuciones latentes y semilla fija 42; los resultados ilustran rigurosamente la metodología de segmentación RFM, pero deben validarse con datos reales de transacciones antes de implementar decisiones comerciales definitivas.</li>
+<li><strong>Variable de satisfacción:</strong> la satisfacción se analiza como atributo descriptivo complementario para enriquecer los perfiles y no como validación externa independiente, dado el origen sintético de los datos.</li>
+<li><strong>Supuestos de K-Means:</strong> K-Means asume grupos aproximadamente esféricos y de dispersión similar, es sensible a la escala y a valores atípicos, y requiere predefinir el número K de antemano.</li>
+<li><strong>Alcance de variables:</strong> solo se utilizaron tres variables RFM; no se consideraron categorías de producto, márgenes de utilidad, devoluciones ni interacción web/móvil.</li>
+<li><strong>Fronteras entre grupos:</strong> aunque el silhouette de 0.585 indica una separación notable, los clientes ubicados en las fronteras entre clústeres pueden presentar asignaciones con cierta cercanía al clúster vecino.</li>
+<li><strong>Imputación de datos:</strong> se imputaron 109 celdas nulas mediante mediana y moda, lo cual preservó el tamaño de muestra sin sesgar promedios, pero puede suavizar ligeramente la varianza original.</li>
+<li><strong>Naturaleza estática:</strong> la segmentación es una fotografía de los últimos 12 meses; el comportamiento comercial evoluciona con el tiempo y la estacionalidad, exigiendo un reentrenamiento periódico.</li>
+</ul>
+<h2>Conclusión</h2>
+<p>K-Means, combinado con una limpieza cuidadosa y el escalado de las variables RFM, permitió transformar una base de clientes sin estructura en cuatro segmentos accionables. El análisis muestra que proteger a un grupo pequeño de clientes VIP y reactivar a los clientes en riesgo tiene más impacto en el ingreso que una promoción general. El dashboard en Streamlit pone estos resultados al alcance del área comercial para filtrar, comparar y decidir con datos.</p>
+
+    </div>
+</body>
+</html>

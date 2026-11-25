@@ -1,0 +1,5 @@
+cluster,nombre,clientes,porcentaje_clientes,frecuencia_media,gasto_medio,gasto_mediano,recencia_media,ticket_medio,edad_media,antiguedad_media,satisfaccion_media,gasto_acumulado,participacion_gasto_%,canal_principal,canal_principal_%
+0,Clientes VIP de alto valor,105,11.67,31.62,44790.88,45955.87,10.95,1431.96,41.86,58.0,4.34,4703042.87,45.57,App móvil,42.86
+1,Clientes leales regulares,248,27.56,17.25,13139.39,12454.9,22.8,761.3,38.12,36.04,3.63,3258568.69,31.57,Online,39.92
+2,Clientes ocasionales de bajo gasto,341,37.89,5.54,2882.7,2438.72,73.3,516.56,32.26,17.06,3.11,983000.73,9.52,Tienda física,55.72
+3,Clientes en riesgo de abandono,206,22.89,8.14,6682.45,6233.64,234.96,810.99,44.89,40.5,2.57,1376585.14,13.34,Tienda física,50.97

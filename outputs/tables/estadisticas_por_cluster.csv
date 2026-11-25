@@ -1,0 +1,29 @@
+cluster,variable,count,mean,std,min,25%,50%,75%,max
+Clientes VIP de alto valor,frecuencia_compras,105.0,31.62,4.59,16.0,29.0,31.0,34.0,41.0
+Clientes VIP de alto valor,gasto_total,105.0,44790.88,8362.28,28882.05,38059.74,45955.87,50394.45,58567.07
+Clientes VIP de alto valor,recencia_dias,105.0,10.95,11.32,1.0,4.0,7.0,14.0,60.0
+Clientes VIP de alto valor,ticket_promedio,105.0,1431.96,287.53,931.83,1233.76,1435.24,1569.07,2877.6
+Clientes VIP de alto valor,edad,105.0,41.86,8.41,24.0,36.0,41.0,47.0,67.0
+Clientes VIP de alto valor,antiguedad_meses,105.0,58.0,16.87,16.0,46.0,57.0,70.0,101.0
+Clientes VIP de alto valor,satisfaccion,105.0,4.34,0.93,1.0,4.0,5.0,5.0,5.0
+Clientes en riesgo de abandono,frecuencia_compras,206.0,8.14,3.15,1.0,6.0,8.0,10.0,16.0
+Clientes en riesgo de abandono,gasto_total,206.0,6682.45,3874.89,658.7,4333.34,6233.64,8267.47,37700.66
+Clientes en riesgo de abandono,recencia_dias,206.0,234.96,45.89,142.0,197.0,231.5,267.5,365.0
+Clientes en riesgo de abandono,ticket_promedio,206.0,810.99,297.36,306.63,649.04,789.62,934.2,3770.07
+Clientes en riesgo de abandono,edad,206.0,44.89,12.59,20.0,36.0,45.0,54.0,80.0
+Clientes en riesgo de abandono,antiguedad_meses,206.0,40.5,20.74,1.0,27.0,40.0,54.0,102.0
+Clientes en riesgo de abandono,satisfaccion,206.0,2.57,1.14,1.0,2.0,3.0,3.0,5.0
+Clientes leales regulares,frecuencia_compras,248.0,17.25,3.53,10.0,15.0,17.0,19.25,30.0
+Clientes leales regulares,gasto_total,248.0,13139.39,4194.35,5055.08,10035.2,12454.9,15311.15,31096.38
+Clientes leales regulares,recencia_dias,248.0,22.8,20.29,2.0,9.0,16.0,31.0,138.0
+Clientes leales regulares,ticket_promedio,248.0,761.3,171.18,226.5,637.2,766.14,866.82,1413.47
+Clientes leales regulares,edad,248.0,38.12,9.33,18.0,32.0,38.0,44.0,69.0
+Clientes leales regulares,antiguedad_meses,248.0,36.04,14.46,1.0,26.0,36.0,46.0,83.0
+Clientes leales regulares,satisfaccion,248.0,3.63,1.03,1.0,3.0,4.0,4.0,5.0
+Clientes ocasionales de bajo gasto,frecuencia_compras,341.0,5.54,2.42,1.0,4.0,5.0,7.0,12.0
+Clientes ocasionales de bajo gasto,gasto_total,341.0,2882.7,1916.7,204.48,1535.29,2438.72,3606.52,10517.97
+Clientes ocasionales de bajo gasto,recencia_dias,341.0,73.3,29.84,4.0,56.0,72.0,93.0,152.0
+Clientes ocasionales de bajo gasto,ticket_promedio,341.0,516.56,278.77,77.6,373.45,458.86,570.79,3397.46
+Clientes ocasionales de bajo gasto,edad,341.0,32.26,9.25,18.0,25.0,31.0,38.0,68.0
+Clientes ocasionales de bajo gasto,antiguedad_meses,341.0,17.06,12.1,1.0,10.0,14.0,21.0,67.0
+Clientes ocasionales de bajo gasto,satisfaccion,341.0,3.11,1.08,1.0,3.0,3.0,4.0,5.0

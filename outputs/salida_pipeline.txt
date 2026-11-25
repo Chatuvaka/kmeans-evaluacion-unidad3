@@ -1,0 +1,387 @@
+
+==========================================================================================
+1. EXPLORACIÓN DE DATOS (dataset crudo)
+==========================================================================================
+
+--- Primeros 10 registros (.head(10)) ---
+  id_cliente  edad     genero     region canal_preferido  antiguedad_meses  frecuencia_compras gasto_total  recencia_dias  satisfaccion
+0   CLI-0064 19.00   Femenino  Occidente          Online                11                7.00     2921.42          46.00          2.00
+1   CLI-0678 54.00  Masculino      Norte       App móvil                17                9.00     4674.03         317.00          1.00
+2   CLI-0141 31.00  Masculino     Centro   Tienda física                43               20.00    17915.46          17.00          4.00
+3   CLI-0054 24.00  Masculino      Norte  TIENDA FISICA                 46               20.00    18496.82           4.00          4.00
+4   CLI-0826 58.00  Masculino     Centro   Tienda física                67                9.00     10039.6         195.00          3.00
+5   CLI-0871 37.00   Femenino      Norte   Tienda física                46               20.00    13704.29           5.00          3.00
+6   CLI-0694 66.00  Masculino  Occidente          Online                83               21.00    14709.14           2.00          1.00
+7   CLI-0830 36.00  Masculino     Centro       App móvil                29               16.00    11575.02          10.00          4.00
+8   CLI-0099 26.00   Femenino      Norte       App móvil                 6                7.00     2709.96            NaN          5.00
+9   CLI-0400 40.00   Femenino      Norte          Online                49               15.00     6713.99          14.00          3.00
+
+--- Dimensiones (.shape) ---
+915 filas x 10 columnas
+
+--- Columnas ---
+['id_cliente', 'edad', 'genero', 'region', 'canal_preferido', 'antiguedad_meses', 'frecuencia_compras', 'gasto_total', 'recencia_dias', 'satisfaccion']
+
+--- Tipos de datos (.dtypes) ---
+id_cliente                str
+edad                  float64
+genero                    str
+region                    str
+canal_preferido           str
+antiguedad_meses        int64
+frecuencia_compras    float64
+gasto_total               str
+recencia_dias         float64
+satisfaccion          float64
+
+Observación: 'gasto_total' no es numérica porque algunos montos se capturaron como texto con '$' y comas; se corrige en la limpieza.
+
+--- Estadísticas descriptivas numéricas (.describe()) ---
+                    count  mean   std   min   25%   50%    75%    max
+edad               890.00 38.32 13.75  2.00 30.00 37.00  45.00 150.00
+antiguedad_meses   915.00 32.29 20.65  1.00 15.00 29.00  46.00 102.00
+frecuencia_compras 915.00 12.32  9.05  0.00  5.00  9.00  17.00  41.00
+recencia_dias      905.00 89.19 89.03 -7.00 17.00 60.00 130.00 365.00
+satisfaccion       895.00  3.28  1.20  1.00  3.00  3.00   4.00   5.00
+
+--- Estadísticas descriptivas categóricas (.describe(include='object')) ---
+                count unique            top freq
+id_cliente        915    900       CLI-0073    2
+genero            915      8       Femenino  451
+region            907     14         Centro  312
+canal_preferido   900     12  Tienda física  371
+gasto_total       896    882        5916.95    2
+
+--- Valores nulos por columna ---
+                    nulos  porcentaje
+id_cliente              0        0.00
+edad                   25        2.73
+genero                  0        0.00
+region                  8        0.87
+canal_preferido        15        1.64
+antiguedad_meses        0        0.00
+frecuencia_compras      0        0.00
+gasto_total            19        2.08
+recencia_dias          10        1.09
+satisfaccion           20        2.19
+Total de celdas nulas: 97
+
+--- Duplicados ---
+Filas duplicadas exactas: 15
+id_cliente repetidos: 15
+
+--- Valores únicos en variables categóricas (revelan inconsistencias) ---
+genero (8 valores distintos): [' FEMENINO', 'F', 'Femenino', 'M', 'MASCULINO ', 'Masculino', 'femenino', 'masculino']
+region (14 valores distintos): [' Centro', ' Norte', ' Sur', 'CENTRO', 'Centro', 'NORTE', 'Norte', 'OCCIDENTE', 'Occidente', 'SUR', 'Sur', 'centro', 'norte', 'sur']
+canal_preferido (12 valores distintos): [' Online ', 'APP MOVIL', 'App movil', 'App móvil', 'ONLINE', 'Online', 'TIENDA FISICA ', 'Tienda Fisica', 'Tienda física', 'app móvil', 'online', 'tienda física']
+
+--- Valores fuera de rango / sospechosos ---
+Montos de gasto guardados como texto con '$': 12
+Edades < 18 o > 90: 7
+Recencias negativas: 3
+Frecuencia de compra igual a 0 con gasto registrado: 3
+Gasto máximo: $78,714.58 | mediana: $6,794.92
+
+--- Gráficas exploratorias ---
+  [figura guardada] outputs/figures/01_distribucion_variables.png
+  [figura guardada] outputs/figures/02_boxplots_atipicos.png
+  [figura guardada] outputs/figures/03_categorias_inconsistentes.png
+  [figura guardada] outputs/figures/04_matriz_correlacion.png
+  [figura guardada] outputs/figures/05_dispersion_frecuencia_gasto.png
+
+--- Variables seleccionadas para el agrupamiento (modelo RFM) ---
+1. recencia_dias  (R): días desde la última compra. Mide qué tan activo está el cliente;
+   es el mejor indicador temprano de abandono.
+2. frecuencia_compras (F): número de compras en los últimos 12 meses. Mide el hábito y
+   la lealtad del cliente.
+3. gasto_total (M): monto gastado en 12 meses. Mide el valor económico del cliente.
+Justificación: las tres responden directamente a la problemática (comportamiento de compra),
+son numéricas continuas (adecuadas para la distancia euclidiana de K-Means) y no son
+redundantes entre sí. 'ticket_promedio' se descarta porque es gasto/frecuencia (redundante);
+edad, satisfacción y variables categóricas se reservan para describir y validar los clústeres.
+
+==========================================================================================
+2. LIMPIEZA Y PREPROCESAMIENTO
+==========================================================================================
+
+--- a) Corrección de inconsistencias en categorías ---
+  - Estandarizar texto: 'canal_preferido' unificada a ['App móvil', 'Online', 'Tienda física'] -> 60 registro(s)
+  - Estandarizar texto: 'genero' unificada a ['Femenino', 'Masculino'] -> 52 registro(s)
+  - Estandarizar texto: 'region' unificada a ['Centro', 'Norte', 'Occidente', 'Sur'] -> 30 registro(s)
+
+--- b) Verificación y corrección de tipos de datos ---
+  - Convertir tipo: 'gasto_total' de texto ('$12,345.50') a float -> 12 registro(s)
+
+--- c) Tratamiento de duplicados ---
+  - Eliminar duplicados: filas idénticas eliminadas (se conserva la primera) -> 15 registro(s)
+  - Eliminar duplicados: id_cliente repetido con datos distintos -> 0 registro(s)
+
+--- d) Valores inválidos (errores de captura) ---
+  - Valor inválido a nulo: 'edad' fuera de rango lógico -> 7 registro(s)
+  - Valor inválido a nulo: 'recencia_dias' fuera de rango lógico -> 3 registro(s)
+  - Valor inválido a nulo: 'frecuencia_compras' fuera de rango lógico -> 3 registro(s)
+
+--- e) Tratamiento de valores nulos ---
+edad                  32
+region                 8
+canal_preferido       15
+frecuencia_compras     3
+gasto_total           18
+recencia_dias         13
+satisfaccion          20
+  - Imputar mediana: 'edad' = 37.00 (robusta a atípicos) -> 32 registro(s)
+  - Imputar mediana: 'frecuencia_compras' = 9.00 (robusta a atípicos) -> 3 registro(s)
+  - Imputar mediana: 'gasto_total' = 6,794.92 (robusta a atípicos) -> 18 registro(s)
+  - Imputar mediana: 'recencia_dias' = 60.00 (robusta a atípicos) -> 13 registro(s)
+  - Imputar mediana: 'satisfaccion' = 3.00 (robusta a atípicos) -> 20 registro(s)
+  - Imputar moda: 'region' = 'Centro' -> 8 registro(s)
+  - Imputar moda: 'canal_preferido' = 'Tienda física' -> 15 registro(s)
+
+--- f) Identificación y tratamiento de valores atípicos ---
+  - Recortar atípicos: 'frecuencia_compras' limitado a [1.00, 50.75] -> 0 registro(s)
+  - Recortar atípicos: 'gasto_total' limitado a [204.48, 58,567.07] -> 9 registro(s)
+  - Recortar atípicos: 'recencia_dias' limitado a [1.00, 466.00] -> 0 registro(s)
+          variable       Q1        Q3       IQR  cerca_superior_1.5IQR  atipicos_detectados_1.5IQR  cerca_extrema_3IQR  limite_recorte  valores_recortados
+frecuencia_compras     5.75     17.00     11.25                  33.88                          36               50.75           50.75                   0
+       gasto_total 2,798.61 13,042.94 10,244.33              28,409.44                         107           43,775.94       58,567.07                   9
+     recencia_dias    18.00    130.00    112.00                 298.00                          24              466.00          466.00                   0
+Criterio: la regla de Tukey (1.5*IQR) marca como atípicos a muchos clientes de alto valor que son
+legítimos (compran mucho y gastan mucho). Por eso solo se recortan (capping) los valores que superan
+a la vez la cerca extrema (3*IQR) y el percentil 99, que corresponden a errores de captura;
+no se elimina ningún cliente.
+  [tabla guardada] outputs/tables/tratamiento_atipicos.csv
+
+--- g) Variable derivada y tipos finales ---
+  - Variable derivada: ticket_promedio = gasto_total / frecuencia_compras -> 900 registro(s)
+id_cliente                 str
+edad                     int64
+genero                category
+region                category
+canal_preferido       category
+antiguedad_meses         int64
+frecuencia_compras       int64
+gasto_total            Float64
+recencia_dias            int64
+satisfaccion             int64
+ticket_promedio        Float64
+
+--- Resumen de la limpieza ---
+Registros: 915 -> 900
+Nulos restantes: 0 | Duplicados restantes: 0
+                    count      mean       std    min      25%      50%       75%       max
+edad               900.00     37.88     11.21  18.00    30.00    37.00     45.00     80.00
+antiguedad_meses   900.00     32.43     20.69   1.00    15.00    30.00     46.00    102.00
+frecuencia_compras 900.00     12.40      9.06   1.00     5.75     9.00     17.00     41.00
+gasto_total        900.00 11,468.00 13,468.67 204.48 2,798.61 6,794.92 13,042.94 58,567.07
+recencia_dias      900.00     89.11     88.55   1.00    18.00    60.00    130.00    365.00
+satisfaccion       900.00      3.28      1.19   1.00     3.00     3.00      4.00      5.00
+ticket_promedio    900.00    758.19    378.12  77.60   493.00   690.28    919.10  3,770.07
+  [figura guardada] outputs/figures/06_boxplots_despues_limpieza.png
+  [tabla guardada] outputs/tables/bitacora_limpieza.csv
+
+--- h) Codificación de variables categóricas (One-Hot Encoding) ---
+Columnas creadas (9): ['genero_Femenino', 'genero_Masculino', 'region_Centro', 'region_Norte', 'region_Occidente', 'region_Sur', 'canal_preferido_App móvil', 'canal_preferido_Online', 'canal_preferido_Tienda física']
+Nota: las variables codificadas NO entran a K-Means; mezclar dummies 0/1 con variables
+continuas distorsiona la distancia euclidiana. Se guardan para análisis complementarios y
+se usan para describir el perfil de cada clúster.
+  [datos guardados] data/processed/clientes_limpios_codificados.csv
+
+==========================================================================================
+3. ESCALADO DE VARIABLES (StandardScaler)
+==========================================================================================
+          variable  media_original  desv_original  min_original  max_original  media_escalada  desv_escalada  min_escalado  max_escalado
+frecuencia_compras           12.40           9.05          1.00         41.00            0.00           1.00         -1.26          3.16
+       gasto_total       11,468.00      13,461.19        204.48     58,567.07            0.00           1.00         -0.84          3.50
+     recencia_dias           89.11          88.50          1.00        365.00            0.00           1.00         -1.00          3.12
+
+Primeros 5 registros escalados:
+   frecuencia_compras  gasto_total  recencia_dias
+0               -0.60        -0.63          -0.49
+1               -0.38        -0.50           2.58
+2                0.84         0.48          -0.81
+3                0.84         0.52          -0.96
+4               -0.38        -0.11           1.20
+
+Explicación: antes de escalar, la desviación estándar del gasto es ~1,487 veces la de la
+frecuencia, por lo que K-Means (basado en distancias) ignoraría prácticamente la frecuencia y la
+recencia. StandardScaler aplica z = (x - media) / desviación, dejando cada variable con media 0 y
+desviación 1; así las tres variables RFM pesan lo mismo en el cálculo de distancias.
+  [figura guardada] outputs/figures/07_escalado_antes_despues.png
+  [tabla guardada] outputs/tables/resumen_escalado.csv
+
+==========================================================================================
+4. SELECCIÓN DEL NÚMERO DE CLÚSTERES (K = 2 a 8)
+==========================================================================================
+ k  inercia  silhouette  davies_bouldin  calinski_harabasz  reduccion_inercia_%
+ 2 1,318.04        0.58            0.56             941.54                  NaN
+ 3   665.75        0.53            0.63           1,370.44                49.49
+ 4   310.00        0.58            0.52           2,302.64                53.44
+ 5   267.77        0.53            0.73           2,032.34                13.62
+ 6   228.18        0.50            0.82           1,936.98                14.79
+ 7   192.61        0.44            0.90           1,937.52                15.59
+ 8   174.31        0.34            1.01           1,846.46                 9.50
+
+K por método del codo: 4 | K por silhouette: 4 | K por Davies-Bouldin: 4
+K ÓPTIMO SELECCIONADO: 4
+Justificación: Se selecciona K = 4 como la solución óptima. Aunque K = 2 presenta un coeficiente de silhouette alto (0.581), K = 4 alcanza el máximo global de silhouette (0.585), el menor índice Davies-Bouldin (0.516 frente a 0.560 en K=2) y un índice Calinski-Harabasz sustancialmente superior (2,303 frente a 942 en K=2). Asimismo, la reducción de inercia refleja un codo evidente en K = 4 (53.4% de reducción de K=3 a K=4, cayendo a solo 13.6% de K=4 a K=5). Desde el punto de vista de negocio y de la metodología RFM, K=2 es insuficiente ya que solo divide la base en dos grupos generales (activos vs. inactivos o alto vs. bajo gasto), impidiendo aislar a los clientes VIP ni distinguir clientes ocasionales de clientes en riesgo; K = 4 produce cuatro segmentos claramente diferenciados, interpretables y accionables.
+  [figura guardada] outputs/figures/08_codo_silhouette.png
+  [tabla guardada] outputs/tables/metricas_por_k.csv
+
+==========================================================================================
+5. MODELO FINAL K-MEANS (K = 4)
+==========================================================================================
+
+--- Centroides en escala estandarizada (z-score) ---
+         frecuencia_compras  gasto_total  recencia_dias
+cluster                                                
+0                      2.12         2.48          -0.88
+1                      0.54         0.12          -0.75
+2                     -0.76        -0.64          -0.18
+3                     -0.47        -0.36           1.65
+
+--- Centroides en unidades originales (inverse_transform) ---
+         frecuencia_compras  gasto_total  recencia_dias
+cluster                                                
+0                     31.62    44,790.88          10.95
+1                     17.25    13,139.39          22.80
+2                      5.54     2,882.70          73.30
+3                      8.14     6,682.45         234.96
+
+--- Registros por clúster ---
+   clientes  porcentaje
+0       105       11.67
+1       248       27.56
+2       341       37.89
+3       206       22.89
+
+--- Métricas del modelo final ---
+inercia: 309.9978
+silhouette: 0.5845
+davies_bouldin: 0.5158
+calinski_harabasz: 2,302.6419
+iteraciones: 4
+
+==========================================================================================
+6. GRÁFICAS DE AGRUPAMIENTOS DEL MODELO FINAL
+==========================================================================================
+  [figura guardada] outputs/figures/09_clusters_dispersion_centroides.png
+  [figura guardada] outputs/figures/10_clusters_pca.png
+  [figura guardada] outputs/figures/11_distribucion_clusters.png
+  [figura guardada] outputs/figures/12_perfil_centroides.png
+  [figura guardada] outputs/figures/13_boxplots_por_cluster.png
+  [figura guardada] outputs/figures/14_canal_por_cluster.png
+
+==========================================================================================
+7. COMPARACIÓN DE CONFIGURACIONES DEL MODELO
+==========================================================================================
+                           configuracion  k escalado  silhouette  davies_bouldin  cluster_mas_chico  cluster_mas_grande  coincidencia_con_A_ARI
+A) K=4 con StandardScaler (modelo final)  4       Sí        0.58            0.52                105                 341                    1.00
+               B) K=3 con StandardScaler  3       Sí        0.53            0.63                116                 572                    0.56
+                      C) K=4 sin escalar  4       No        0.35            1.08                 47                 510                    0.51
+
+Nota metodológica sobre el espacio de evaluación: Las métricas de Silhouette y Davies-Bouldin para todas las configuraciones (incluyendo la opción sin escalar C) se calculan en el espacio estandarizado (z-score) de las variables RFM. Esto garantiza una comparación matemática rigurosa bajo una misma métrica geométrica. Si la configuración C se evaluara en su espacio original sin escalar, las distancias reflejarían casi en un 100% las diferencias en pesos del gasto total (desviación ~13,461 MXN frente a ~9 en frecuencia), ocultando que el algoritmo ignoró la recencia y la frecuencia en la delimitación de los clústeres.
+
+* A vs. B (cambiar K): con K=3 el silhouette pasa de 0.585 a 0.528 (peor). Se fusionan en un mismo grupo: 'Clientes leales regulares' + 'Clientes ocasionales de bajo gasto'. Mezclar perfiles distintos en un solo grupo impide diseñar estrategias específicas, por lo que se conserva el K óptimo.
+* A vs. C (escalar o no): sin StandardScaler el gasto (miles de pesos) domina la distancia euclidiana y los grupos se forman casi solo por monto. Se fusionan en un mismo grupo: 'Clientes ocasionales de bajo gasto' + 'Clientes en riesgo de abandono'. Se parten en dos o más grupos: 'Clientes VIP de alto valor'. Al evaluar ambas configuraciones en el espacio estandarizado para una comparación justa, la coincidencia con el modelo final es solo ARI = 0.510 y el silhouette cae a 0.352: la recencia (clave para detectar abandono) y la frecuencia pierden relevancia en la asignación de clústeres.
+
+--- Tabla cruzada: modelo final (filas) vs. configuración sin escalar (columnas) ---
+grupo_sin_escalar                     0   1    2   3
+modelo_final                                        
+Clientes VIP de alto valor            0  41    0  64
+Clientes en riesgo de abandono      154   1   51   0
+Clientes leales regulares            20   5  223   0
+Clientes ocasionales de bajo gasto  336   0    5   0
+  [figura guardada] outputs/figures/15_comparacion_configuraciones.png
+  [tabla guardada] outputs/tables/comparacion_configuraciones.csv
+
+==========================================================================================
+8. ANÁLISIS E INTERPRETACIÓN DE LOS CLÚSTERES
+==========================================================================================
+
+--- Interpretación de centroides (z-score: + sobre el promedio, - bajo el promedio) ---
+C0 -> Clientes VIP de alto valor: frecuencia_compras=+2.12 (alto), gasto_total=+2.48 (alto), recencia_dias=-0.88 (bajo)
+C1 -> Clientes leales regulares: frecuencia_compras=+0.54 (alto), gasto_total=+0.12 (promedio), recencia_dias=-0.75 (bajo)
+C2 -> Clientes ocasionales de bajo gasto: frecuencia_compras=-0.76 (bajo), gasto_total=-0.64 (bajo), recencia_dias=-0.18 (promedio)
+C3 -> Clientes en riesgo de abandono: frecuencia_compras=-0.47 (promedio), gasto_total=-0.36 (promedio), recencia_dias=+1.65 (alto)
+
+--- Tabla comparativa de clústeres ---
+                                     nombre  clientes  porcentaje_clientes  frecuencia_media  gasto_medio  gasto_mediano  recencia_media  ticket_medio  edad_media  antiguedad_media  satisfaccion_media  gasto_acumulado  participacion_gasto_% canal_principal  canal_principal_%
+cluster                                                                                                                                                                                                                                                                            
+0                Clientes VIP de alto valor       105                11.67             31.62    44,790.88      45,955.87           10.95      1,431.96       41.86             58.00                4.34     4,703,042.87                  45.57       App móvil              42.86
+1                 Clientes leales regulares       248                27.56             17.25    13,139.39      12,454.90           22.80        761.30       38.12             36.04                3.63     3,258,568.69                  31.57          Online              39.92
+2        Clientes ocasionales de bajo gasto       341                37.89              5.54     2,882.70       2,438.72           73.30        516.56       32.26             17.06                3.11       983,000.73                   9.52   Tienda física              55.72
+3            Clientes en riesgo de abandono       206                22.89              8.14     6,682.45       6,233.64          234.96        810.99       44.89             40.50                2.57     1,376,585.14                  13.34   Tienda física              50.97
+  [tabla guardada] outputs/tables/tabla_comparativa_clusters.csv
+
+--- Estadísticas descriptivas por clúster (variables RFM) ---
+                           cluster           variable  count      mean      std       min       25%       50%       75%       max
+        Clientes VIP de alto valor frecuencia_compras 105.00     31.62     4.59     16.00     29.00     31.00     34.00     41.00
+        Clientes VIP de alto valor        gasto_total 105.00 44,790.88 8,362.28 28,882.05 38,059.74 45,955.87 50,394.45 58,567.07
+        Clientes VIP de alto valor      recencia_dias 105.00     10.95    11.32      1.00      4.00      7.00     14.00     60.00
+    Clientes en riesgo de abandono frecuencia_compras 206.00      8.14     3.15      1.00      6.00      8.00     10.00     16.00
+    Clientes en riesgo de abandono        gasto_total 206.00  6,682.45 3,874.89    658.70  4,333.34  6,233.64  8,267.47 37,700.66
+    Clientes en riesgo de abandono      recencia_dias 206.00    234.96    45.89    142.00    197.00    231.50    267.50    365.00
+         Clientes leales regulares frecuencia_compras 248.00     17.25     3.53     10.00     15.00     17.00     19.25     30.00
+         Clientes leales regulares        gasto_total 248.00 13,139.39 4,194.35  5,055.08 10,035.20 12,454.90 15,311.15 31,096.38
+         Clientes leales regulares      recencia_dias 248.00     22.80    20.29      2.00      9.00     16.00     31.00    138.00
+Clientes ocasionales de bajo gasto frecuencia_compras 341.00      5.54     2.42      1.00      4.00      5.00      7.00     12.00
+Clientes ocasionales de bajo gasto        gasto_total 341.00  2,882.70 1,916.70    204.48  1,535.29  2,438.72  3,606.52 10,517.97
+Clientes ocasionales de bajo gasto      recencia_dias 341.00     73.30    29.84      4.00     56.00     72.00     93.00    152.00
+  [tabla guardada] outputs/tables/estadisticas_por_cluster.csv
+
+--- Comparación contra el promedio general (índice: 100 = promedio) ---
+                                    frecuencia_compras  gasto_total  recencia_dias  ticket_promedio  satisfaccion
+cluster_nombre                                                                                                   
+Clientes VIP de alto valor                      255.00       391.00          12.00           189.00        133.00
+Clientes en riesgo de abandono                   66.00        58.00         264.00           107.00         79.00
+Clientes leales regulares                       139.00       115.00          26.00           100.00        111.00
+Clientes ocasionales de bajo gasto               45.00        25.00          82.00            68.00         95.00
+
+--- Similitudes y diferencias entre clústeres (distancia entre centroides) ---
+                         cluster_a                          cluster_b  distancia_centroides
+         Clientes leales regulares Clientes ocasionales de bajo gasto                  1.61
+Clientes ocasionales de bajo gasto     Clientes en riesgo de abandono                  1.87
+         Clientes leales regulares     Clientes en riesgo de abandono                  2.64
+        Clientes VIP de alto valor          Clientes leales regulares                  2.84
+        Clientes VIP de alto valor Clientes ocasionales de bajo gasto                  4.30
+        Clientes VIP de alto valor     Clientes en riesgo de abandono                  4.60
+Los grupos más parecidos son 'Clientes leales regulares' y 'Clientes ocasionales de bajo gasto' (distancia entre centroides = 1.61 en z-score); los más diferentes son 'Clientes VIP de alto valor' y 'Clientes en riesgo de abandono' (distancia = 4.60).
+
+--- Descripción de los grupos ---
+C0 - Clientes VIP de alto valor: Son los clientes más valiosos: compran con mucha frecuencia, gastan más que nadie y siguen activos. Agrupa 105 clientes (11.7%). En promedio compran 31.6 veces al año, gastan $44,791 MXN anuales (ticket promedio $1,432) y su última compra fue hace 11 días. Canal predominante: App móvil (43%). Satisfacción promedio: 4.34/5.
+C1 - Clientes leales regulares: Compran de forma constante con un gasto intermedio; son la base estable del negocio. Agrupa 248 clientes (27.6%). En promedio compran 17.3 veces al año, gastan $13,139 MXN anuales (ticket promedio $761) y su última compra fue hace 23 días. Canal predominante: Online (40%). Satisfacción promedio: 3.63/5.
+C2 - Clientes ocasionales de bajo gasto: Compran pocas veces y con tickets bajos; son clientes recientes o poco comprometidos con la marca. Agrupa 341 clientes (37.9%). En promedio compran 5.5 veces al año, gastan $2,883 MXN anuales (ticket promedio $517) y su última compra fue hace 73 días. Canal predominante: Tienda física (56%). Satisfacción promedio: 3.11/5.
+C3 - Clientes en riesgo de abandono: Llevan meses sin comprar; si no se reactivan es muy probable que se pierdan. Agrupa 206 clientes (22.9%). En promedio compran 8.1 veces al año, gastan $6,682 MXN anuales (ticket promedio $811) y su última compra fue hace 235 días. Canal predominante: Tienda física (51%). Satisfacción promedio: 2.57/5.
+
+--- Hallazgos ---
+1. Se identificaron 4 segmentos bien diferenciados (K óptimo = 4, silhouette = 0.585); el codo, el silhouette y Davies-Bouldin coinciden en esa elección.
+2. Concentración del valor: 'Clientes VIP de alto valor' representa solo el 11.7% de los clientes pero aporta el 45.6% del gasto total; cada uno gasta en promedio $44,791 MXN al año.
+3. Ingreso en riesgo: 'Clientes en riesgo de abandono' agrupa al 22.9% de los clientes, no compra desde hace 235 días en promedio, 21 veces más que los VIP, y su gasto histórico suma $1,376,585 MXN (13.3% del total) que podría perderse.
+4. Base amplia de bajo valor: 'Clientes ocasionales de bajo gasto' es el 37.9% de los clientes pero solo genera el 9.5% del gasto; su ticket promedio ($517) y frecuencia (5.5 compras/año) son los más bajos, y su canal principal es Tienda física.
+5. Caracterización con satisfacción (variable descriptiva complementaria): al ser un dataset sintético, la satisfacción no constituye una validación externa independiente, pero sí funciona como una variable descriptiva complementaria muy reveladora: la satisfacción promedio es 4.34/5 en 'Clientes VIP de alto valor' contra solo 2.57/5 en 'Clientes en riesgo de abandono', lo que demuestra consistencia cualitativa entre el abandono en compras y una menor experiencia percibida.
+6. Canal: el 43% de 'Clientes VIP de alto valor' prefiere App móvil, mientras que en 'Clientes leales regulares' el canal principal es Online.
+7. Los grupos más parecidos son 'Clientes leales regulares' y 'Clientes ocasionales de bajo gasto' (distancia entre centroides = 1.61 en z-score); los más diferentes son 'Clientes VIP de alto valor' y 'Clientes en riesgo de abandono' (distancia = 4.60).
+
+--- Recomendaciones ---
+1. Retener a 'Clientes VIP de alto valor' con un programa de lealtad premium (acceso anticipado, envío gratis, atención prioritaria y beneficios exclusivos en App móvil). Perder a uno de estos clientes equivale a perder ~$44,791 MXN al año.
+2. Hacer crecer a 'Clientes leales regulares' con ventas cruzadas, paquetes y metas de puntos para subir su ticket (hoy $761) y convertirlos en VIP.
+3. Activar a 'Clientes ocasionales de bajo gasto' con cupón de segunda compra, recordatorios personalizados por Tienda física y contenido de bienvenida para aumentar su frecuencia (5.5 compras/año).
+4. Lanzar una campaña de reactivación (win-back) para 'Clientes en riesgo de abandono': descuento por tiempo limitado, encuesta de satisfacción (su promedio es 2.57/5) y seguimiento a los 60 y 90 días sin compra antes de que el cliente llegue a esta etapa.
+5. Recalcular la segmentación cada mes y monitorear la migración de clientes entre segmentos como KPI de retención (por ejemplo, % de clientes que pasan de 'regular' a 'en riesgo').
+
+--- Limitaciones del modelo ---
+1. El dataset es sintético (generado con semilla fija 42 a partir de distribuciones latentes); los resultados ilustran con fidelidad la metodología de segmentación RFM, pero deben contrastarse con datos reales de transacciones antes de tomar decisiones operativas o comerciales.
+2. La satisfacción y las variables sociodemográficas se analizan como atributos descriptivos complementarios para perfilar los grupos y no como una validación externa independiente, dado el origen sintético del dataset.
+3. K-Means asume grupos aproximadamente esféricos y de dispersión similar, es sensible a la escala de las variables y a la presencia de valores atípicos, y requiere definir el número K de antemano.
+4. El modelo se enfoca estrictamente en las tres variables RFM (recencia, frecuencia y gasto total); no incorpora categorías de producto, margen de rentabilidad, devoluciones ni interacción en canales digitales.
+5. El coeficiente de silhouette (0.585) constata una separación sólida y compacta de los grupos, pero los clientes situados en las regiones frontera pueden presentar asignaciones con cierto grado de proximidad al clúster vecino.
+6. Se imputaron 109 celdas nulas mediante mediana (numéricas) y moda (categóricas); si bien preserva el tamaño muestral sin distorsionar tendencias centrales, puede atenuar levemente la varianza natural.
+7. La segmentación refleja una imagen estática de los últimos 12 meses: los patrones de compra evolucionan con el tiempo y la estacionalidad, por lo que el modelo debe ejecutarse y calibrarse periódicamente.
+
+==========================================================================================
+PIPELINE TERMINADO
+==========================================================================================
+Dataset segmentado: data/processed/clientes_segmentados.csv
+Resultados del modelo: outputs/resultados_modelo.json
+Figuras: outputs/figures/ (23 archivos)
+Siguiente paso: streamlit run app.py

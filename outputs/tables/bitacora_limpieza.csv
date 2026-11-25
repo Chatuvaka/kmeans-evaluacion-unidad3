@@ -1,0 +1,21 @@
+paso,detalle,registros_afectados
+Estandarizar texto,"'canal_preferido' unificada a ['App móvil', 'Online', 'Tienda física']",60
+Estandarizar texto,"'genero' unificada a ['Femenino', 'Masculino']",52
+Estandarizar texto,"'region' unificada a ['Centro', 'Norte', 'Occidente', 'Sur']",30
+Convertir tipo,"'gasto_total' de texto ('$12,345.50') a float",12
+Eliminar duplicados,filas idénticas eliminadas (se conserva la primera),15
+Eliminar duplicados,id_cliente repetido con datos distintos,0
+Valor inválido a nulo,'edad' fuera de rango lógico,7
+Valor inválido a nulo,'recencia_dias' fuera de rango lógico,3
+Valor inválido a nulo,'frecuencia_compras' fuera de rango lógico,3
+Imputar mediana,'edad' = 37.00 (robusta a atípicos),32
+Imputar mediana,'frecuencia_compras' = 9.00 (robusta a atípicos),3
+Imputar mediana,"'gasto_total' = 6,794.92 (robusta a atípicos)",18
+Imputar mediana,'recencia_dias' = 60.00 (robusta a atípicos),13
+Imputar mediana,'satisfaccion' = 3.00 (robusta a atípicos),20
+Imputar moda,'region' = 'Centro',8
+Imputar moda,'canal_preferido' = 'Tienda física',15
+Recortar atípicos,"'frecuencia_compras' limitado a [1.00, 50.75]",0
+Recortar atípicos,"'gasto_total' limitado a [204.48, 58,567.07]",9
+Recortar atípicos,"'recencia_dias' limitado a [1.00, 466.00]",0
+Variable derivada,ticket_promedio = gasto_total / frecuencia_compras,900

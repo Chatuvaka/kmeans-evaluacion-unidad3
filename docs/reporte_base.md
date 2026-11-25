@@ -19,7 +19,7 @@
 
 **Grupo:** IDGS 9 - 3  
 **Fecha:** 24 / Noviembre / 2026  
-**Repositorio GitHub:** `[PEGAR AQUÍ EL ENLACE AL REPOSITORIO PÚBLICO DE GITHUB]`
+**Repositorio GitHub:** https://github.com/Chatuvaka/kmeans-evaluacion-unidad3
 
 </div>
 

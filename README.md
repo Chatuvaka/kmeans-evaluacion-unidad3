@@ -11,7 +11,7 @@ Segmentación de clientes por comportamiento de compra (**recencia, frecuencia y
 | **Integrantes** | Jesus Rodolfo Lopez Gamez · Josue Misraim Valenzuela Verdugo · Axel Alan Jimenez Jaramillo |
 | **Grupo:** | IDGS 9 - 3 |
 | **Fecha** | 24/11/2026 |
-| **Repositorio GitHub** | `[PEGAR AQUÍ EL ENLACE AL REPOSITORIO PÚBLICO DE GITHUB]` |
+| **Repositorio GitHub** | https://github.com/Chatuvaka/kmeans-evaluacion-unidad3 |
 
 ## Descripción
 
@@ -81,7 +81,7 @@ proyecto_tercer_unidad_kmeans/
 ### 1. Clonar el repositorio
 
 ```bash
-git clone [PEGAR AQUÍ EL ENLACE AL REPOSITORIO PÚBLICO DE GITHUB]
+git clone https://github.com/Chatuvaka/kmeans-evaluacion-unidad3.git
 cd proyecto_tercer_unidad_kmeans
 ```
 
